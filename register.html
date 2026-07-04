@@ -52,6 +52,88 @@
         </form>
     </div>
 
+    <script>
+        // Point this at wherever your backend actually runs
+        const API_BASE = 'https://login-form-server.onrender.com/api/auth';
+
+        const btn = document.getElementById('btn');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const form = document.querySelector('.container.register form');
+
+        // The button's inline onclick redirects immediately - neutralize
+        // that at runtime (without editing the HTML) so we can decide
+        // whether to redirect based on what the server says.
+        btn.onclick = null;
+
+        // No error markup exists in this file, so a small banner is
+        // created here at runtime instead of editing the HTML itself.
+        const errorBanner = document.createElement('div');
+        errorBanner.style.cssText =
+            'width:100%;display:none;color:#fff;background:rgba(220,38,38,.9);' +
+            'border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:10px;' +
+            'font-size:14px;font-weight:600;text-align:center;margin-bottom:10px;';
+        form.parentNode.insertBefore(errorBanner, form);
+
+        let errorTimeout;
+
+        function showError(message) {
+            errorBanner.textContent = message;
+            errorBanner.style.display = 'block';
+
+            clearTimeout(errorTimeout);
+            errorTimeout = setTimeout(clearError, 2000);
+        }
+
+        function clearError() {
+            errorBanner.textContent = '';
+            errorBanner.style.display = 'none';
+        }
+
+        btn.addEventListener('click', async function () {
+            clearError();
+
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showError('Passwords do not match');
+                return;
+            }
+
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName: fullNameInput.value.trim(),
+                        email: emailInput.value.trim(),
+                        password: passwordInput.value,
+                        confirmPassword: confirmPasswordInput.value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const message = data.errors
+                        ? Object.values(data.errors).join(' ')
+                        : 'Something went wrong. Please try again.';
+                    showError(message);
+                    return;
+                }
+
+                window.location.href = 'index.html';
+
+            } catch (err) {
+                showError('Unable to reach the server. Is the backend running?');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+
 </body>
 
 </html>

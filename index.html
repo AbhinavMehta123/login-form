@@ -101,19 +101,74 @@
     </div>
 
     <script>
+        // Point this at wherever your backend actually runs
+        const API_BASE = 'https://login-form-server.onrender.com/api/auth';
+
         const form = document.getElementById('loginForm');
         const heading = document.getElementById('heading');
         const successMsg = document.getElementById('successMsg');
+        const submitBtn = document.getElementById('btn');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
 
-        form.addEventListener('submit', function (e) {
+        // No error markup exists in this file, so a small banner is
+        // created here at runtime instead of editing the HTML itself.
+        const errorBanner = document.createElement('div');
+        errorBanner.style.cssText =
+            'width:100%;display:none;color:#fff;background:rgba(220,38,38,.9);' +
+            'border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:10px;' +
+            'font-size:14px;font-weight:600;text-align:center;margin-bottom:10px;';
+        form.parentNode.insertBefore(errorBanner, form);
+
+        let errorTimeout;
+
+        function showError(message) {
+            errorBanner.textContent = message;
+            errorBanner.style.display = 'block';
+
+            clearTimeout(errorTimeout);
+            errorTimeout = setTimeout(clearError, 2000);
+        }
+
+        function clearError() {
+            errorBanner.textContent = '';
+            errorBanner.style.display = 'none';
+        }
+
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
+            clearError();
+            submitBtn.disabled = true;
 
-            // Front-end only demo: swap the form out for a success state.
-            // Hook this up to your real login/auth request here, and only
-            // show the success state once that request actually succeeds.
-            form.style.display = 'none';
-            heading.textContent = 'Welcome';
-            successMsg.style.display = 'flex';
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: emailInput.value.trim(),
+                        password: passwordInput.value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const message = data.errors
+                        ? Object.values(data.errors).join(' ')
+                        : 'Something went wrong. Please try again.';
+                    showError(message);
+                    return;
+                }
+
+                form.style.display = 'none';
+                heading.textContent = 'Welcome';
+                successMsg.style.display = 'flex';
+
+            } catch (err) {
+                showError('Unable to reach the server. Is the backend running?');
+            } finally {
+                submitBtn.disabled = false;
+            }
         });
     </script>
 
