@@ -7,34 +7,115 @@
     <title>Login Form</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/97ebdf5864.js" crossorigin="anonymous"></script>
+    <style>
+        /* Inlined so it always applies even if style.css doesn't
+           get refreshed for any reason */
+        .success-msg{
+            width:100%;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            text-align:center;
+            color:#fff;
+        }
+
+        .check-icon{
+            width:60px;
+            height:60px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:50%;
+            background:#4ade80;
+            color:#fff;
+            font-size:30px;
+            font-weight:bold;
+            margin-bottom:15px;
+        }
+
+        .success-msg p{
+            margin-top:0;
+            margin-bottom:20px;
+            font-size:16px;
+        }
+
+        .container.login #successBtn{
+            display:block;
+            width:100%;
+            height:50px;
+            line-height:50px;
+            margin-top:10px;
+            border:none;
+            border-radius:40px;
+            background:#fff;
+            color:#000 !important;
+            font-size:18px;
+            font-weight:bold;
+            text-transform:uppercase;
+            text-align:center;
+            text-decoration:none !important;
+            transition:.3s;
+        }
+
+        .container.login #successBtn:hover{
+            background:rgba(255,255,255,.2);
+            color:#fff !important;
+            border:2px solid #fff;
+        }
+    </style>
 </head>
 <body>
-     
-    <div class="container">
-        <h2>Login</h2>
 
-        <form action="">
-            
+    <div class="container login">
+        <h2 id="heading">Login</h2>
+
+        <form id="loginForm" action="">
+
             <div class="form-group">
-                <input type="email" required>
-                <label for="">Email</label>
+                <input type="email" id="email" required>
+                <label for="email">Email</label>
                 <i class="fa-solid fa-envelope"></i>
             </div>
 
             <div class="form-group">
-                <input type="password" required>
-                <label for="">Password</label>
+                <input type="password" id="password" required>
+                <label for="password">Password</label>
                 <i class="fa-solid fa-lock"></i>
             </div>
 
-            <p><a href="forgot password.html">Forget Password</a></p>
+            <div class="remember">
+                <a href="forgot password.html">Forgot Password?</a>
+            </div>
 
             <input id="btn" type="submit" value="Login">
 
-            <p>Don't have a account? <a href="register.html">Register</a></p>
+            <p>Don't have an account? <a href="register.html">Register</a></p>
 
         </form>
+
+        <div id="successMsg" class="success-msg" style="display:none;">
+            <div class="check-icon">&#10003;</div>
+            <p>Login successful! Welcome back.</p>
+            <a href="index.html" id="successBtn">Back to Home</a>
+        </div>
     </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const heading = document.getElementById('heading');
+        const successMsg = document.getElementById('successMsg');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Front-end only demo: swap the form out for a success state.
+            // Hook this up to your real login/auth request here, and only
+            // show the success state once that request actually succeeds.
+            form.style.display = 'none';
+            heading.textContent = 'Welcome';
+            successMsg.style.display = 'flex';
+        });
+    </script>
 
 </body>
 </html>
